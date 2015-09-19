@@ -38,6 +38,12 @@ function failedLoadConversation(xhr, textStatus, error) {
 	$("#error-display").text(textStatus + ": " + error).show();
 }
 function loadHandler() {
+	conversationData = localStorage.conversationData;
+	if (!conversationData) {
+		$("#loading").hide();
+		$("#error-display").text("Hey, this isn't a Facebook conversation (go to messages full view)!").show();
+		return;
+	}
 	jQuery.getJSON(API_ENDPOINT, "data=" + encodeURIComponent(conversationData), loadedConversation).fail(
 		failedLoadConversation);
 }

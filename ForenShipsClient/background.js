@@ -8,6 +8,9 @@ chrome.webRequest.onBeforeRequest.addListener(
 chrome.webRequest.onSendHeaders.addListener(
 		handleSendHeaders, {urls: [monUrl]},
 		["requestHeaders"]);
+function setActive(active) {
+	localStorage.conversationData = JSON.stringify(active);
+}
 function parsePostData(postDataRaw) {
 	var splited = postDataRaw.split("&");
 	var a = {};
@@ -34,6 +37,7 @@ function handleBeforeRequest(details) {
 		}
 	}
 	if (uids.length > 0) active.uids = uids;
+	setActive(active);
 }
 function handleSendHeaders(details) {
 	var requestHeadersRaw = details.requestHeaders;
@@ -43,10 +47,5 @@ function handleSendHeaders(details) {
 		cookiesHeaderRaw = requestHeadersRaw[i].value;
 	}
 	active["Cookie"] = cookiesHeaderRaw;
-	console.log(active);
+	setActive(active);
 }
-
-chrome.browserAction.onClicked.addListener(function(tab) {
-	if (!active["Cookie"]) return;
-	chrome.tabs.executeScript(null, {file: "content_script.js"});
-});
