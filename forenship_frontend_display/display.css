@@ -1,0 +1,29 @@
+#health-points {
+	font-size: 2em;
+}
+.metric-label {
+	font-size: 1.3em;
+	color: grey;
+}
+.card {
+	background-color: white;
+	margin: 8px;
+	padding: 4px;
+	width: 200px;
+}
+body {
+	background-color: #bebebe;
+	font-family: Arial, sans-serif;
+}
+#chart svg {
+	width: 600px;
+	height: 400px;
+}
+#chart {
+	width: 600px;
+	height: 400px;
+	background-color: white;
+}
+#sidebar {
+	float: right;
+}
