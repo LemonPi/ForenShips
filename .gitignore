@@ -4,3 +4,4 @@ js-beautify
 derp
 /Messages
 msg.txt
+*.pyc

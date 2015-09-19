@@ -1,3 +1,4 @@
+CONVERSATION_ID = value you see under `Form Data` under: "messages[user_id][copy_this_number]" as STRING
 USER_COOKIE = value you see in Chrome under `Request Headers` as a STRING
 USER_DYN = value you see in Chrome under `Form Data` as a STRING
 USER_ID =  value you see in Chrome under `Form Data` as a STRING

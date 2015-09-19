@@ -19,7 +19,7 @@ __email__ = "raghavsood@appaholics.in"
 __status__ = "Production"
 
 if len(sys.argv) <= 1:
-	print "Usage:\n 	python dumper.py [conversation ID] [chunk_size (recommended: 2000)] [{optional} offset location (default: 0)]"
+	print "Usage:\n 	python dumper.py [chunk_size (recommended: 2000)] [{optional} offset location (default: 0)]"
 	print "Example conversation with Raghav Sood"
 	print "	python dumper.py 1075686392 2000 0"
 	sys.exit()
@@ -28,11 +28,11 @@ error_timeout = 30 # Change this to alter error timeout (seconds)
 general_timeout = 7 # Change this to alter waiting time afetr every request (seconds)
 raw_messages = []
 body_messages = []
-talk = sys.argv[1]
-offset = int(sys.argv[3]) if len(sys.argv) >= 4 else int("0")
+talk = CONVERSATION_ID
+offset = int(sys.argv[2]) if len(sys.argv) >= 3 else int("0")
 messages_data = "lolno"
 end_mark = "\"end_of_history\""
-limit = int(sys.argv[2])
+limit = int(sys.argv[1])
 headers = {"origin": "https://www.facebook.com", 
 "accept-encoding": "gzip,deflate", 
 "accept-language": "en-US,en;q=0.8", 
