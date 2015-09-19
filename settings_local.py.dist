@@ -1,0 +1,8 @@
+USER_COOKIE = value you see in Chrome under `Request Headers`
+USER_DYN = value you see in Chrome under `Form Data` 
+USER_ID =  value you see in Chrome under `Form Data`
+USER_A = value you see in Chrome under `Form Data`
+USER_REQ = value you see in Chrome under `Form Data`
+USER_DTSG = value you see in Chrome under `Form Data`
+USER_TTSTAMP = value you see in Chrome under `Form Data`
+USER_REV = value you see in Chrome under `Form Data`
