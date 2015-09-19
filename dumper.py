@@ -30,7 +30,7 @@ messages = []
 talk = sys.argv[1]
 offset = int(sys.argv[3]) if len(sys.argv) >= 4 else int("0")
 messages_data = "lolno"
-end_mark = "\"payload\":{\"end_of_history\""
+end_mark = "\"end_of_history\""
 limit = int(sys.argv[2])
 headers = {"origin": "https://www.facebook.com", 
 "accept-encoding": "gzip,deflate", 
