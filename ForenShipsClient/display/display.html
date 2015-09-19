@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="lib/jquery.min.js"></script>
+<script src="lib/d3.min.js"></script>
+<script src="lib/nv.d3.min.js"></script>
+<link rel="stylesheet" href="lib/nv.d3.min.css" type="text/css">
+<link rel="stylesheet" href="display.css" type="text/css">
+<script src="display.js"></script>
+</head>
+<body>
+<h1 id="loading">Loading...</h1>
+<div style="display:none" id="error-display"></div>
+<div id="interface-container" style="display: none">
+	<div id="chart"><svg></svg></div>
+	<div id="sidebar">
+		<div class="card">
+			 <div class="metric-label">Relationship Health</div>
+			 <div id="health-points"></div>
+		</div>
+		<div class="card">
+			 <div class="metric-label">Status</div>
+			 <div id="relationship-status"></div>
+		</div>
+	</div><!--sidebar-->
+
+</div><!--interface-container-->
+</body>
+</html>
