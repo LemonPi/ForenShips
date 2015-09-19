@@ -53,16 +53,18 @@ def dumpFBMsg(CONF, limit, offset, __DEBUG):
 
     while end_mark not in messages_data:
 
-            data_text = {"messages[user_ids][" + str(talk) + "][offset]": str(offset), 
-            "messages[user_ids][" + str(talk) + "][limit]": str(limit), 
-            "client": "web_messenger", 
-            "__user": CONF["USER_ID"], 
-            "__a": CONF["USER_A"], 
-            "__dyn": CONF["USER_DYN"], 
-            "__req": CONF["USER_REQ"], 
-            "fb_dtsg": CONF["USER_FB_DTSG"], 
-            "ttstamp": CONF["USER_TTSTAMP"], 
-            "__rev": CONF["USER_REV"]}
+            data_text = {
+                "messages[user_ids][" + str(talk) + "][offset]": str(offset), 
+                "messages[user_ids][" + str(talk) + "][limit]": str(limit), 
+                "client": "web_messenger", 
+                "__user": CONF["USER_ID"], 
+                "__a": CONF["USER_A"], 
+                "__dyn": CONF["USER_DYN"], 
+                "__req": CONF["USER_REQ"], 
+                "fb_dtsg": CONF["USER_FB_DTSG"], 
+                "ttstamp": CONF["USER_TTSTAMP"], 
+                "__rev": CONF["USER_REV"]
+            }
             data = urllib.urlencode(data_text)
             url = "https://www.facebook.com/ajax/mercury/thread_info.php"
             
