@@ -1,32 +1,38 @@
+body {
+	font-family: Arial, sans-serif;
+	width: 900px;
+	height: 420px;
+	overflow-x:hidden;
+}
+
 #health-points {
 	font-size: 2em;
+}
+#interface-container {
+	display:flex;
 }
 .metric-label {
 	font-size: 1.3em;
 	color: grey;
 }
 .card {
-	background-color: white;
 	margin: 8px;
 	padding: 4px;
 	width: 200px;
-	border-radius: 6px;
+	border: 1px solid #bebebe;
+	border-radius: 4px;
 }
-body {
-	background-color: #bebebe;
-	font-family: Arial, sans-serif;
-}
+
 #chart svg {
-	width: 600px;
+	/*width: 600px;*/
 	height: 400px;
 }
 #chart {
-	width: 600px;
 	height: 400px;
-	float: left;
+	flex: 2;
 	background-color: white;
 	border-radius: 6px;
 }
 #sidebar {
-	float: right;
+	flex: 1;
 }
