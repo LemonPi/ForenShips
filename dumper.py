@@ -26,7 +26,8 @@ if len(sys.argv) <= 1:
 
 error_timeout = 30 # Change this to alter error timeout (seconds)
 general_timeout = 7 # Change this to alter waiting time afetr every request (seconds)
-messages = []
+raw_messages = []
+body_messages = []
 talk = sys.argv[1]
 offset = int(sys.argv[3]) if len(sys.argv) >= 4 else int("0")
 messages_data = "lolno"
@@ -85,7 +86,10 @@ while end_mark not in messages_data:
 	json_data = json.loads(messages_data)
 	if json_data is not None and json_data['payload'] is not None:
 		try:
-			messages = messages + json_data['payload']['actions']
+                        tmp_msg = json_data['payload']['actions']
+			raw_messages = raw_messages + tmp_msg
+                        for msg in tmp_msg:
+                            body_messages = body_messages + [str(msg['body']) + "\n"]
 		except KeyError:
 			pass #no more messages
 	else:
@@ -101,8 +105,14 @@ while end_mark not in messages_data:
 	offset = offset + limit
 	time.sleep(general_timeout) 
 
+if raw_messages is not None:
+    msgfile = open("msg.txt", "wb")
+    for msg_blk in raw_messages:
+        msgfile.writelines("%s: %s\n" % (str(msg_blk['author']), str(msg_blk['body'])))
+    msgfile.close()
+
 finalfile = open(directory + "complete.json", 'wb')
-finalfile.write(json.dumps(messages))
+finalfile.write(json.dumps(raw_messages))
 finalfile.close()
 command = "python -mjson.tool " + directory + "complete.json > " + pretty_directory + "complete.pretty.json"
 os.system(command)
