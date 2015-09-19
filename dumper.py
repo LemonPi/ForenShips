@@ -27,7 +27,7 @@ if len(sys.argv) <= 1:
 error_timeout = 30 # Change this to alter error timeout (seconds)
 general_timeout = 7 # Change this to alter waiting time afetr every request (seconds)
 messages = []
-talk = sys.argv[1]
+talk = CONVERSATION_ID
 offset = int(sys.argv[3]) if len(sys.argv) >= 4 else int("0")
 messages_data = "lolno"
 end_mark = "\"end_of_history\""
