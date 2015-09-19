@@ -9,3 +9,5 @@ var __CONFIG_PARAM = {
     "ttstamp"         : value you see in Chrome under `Form Data` as a STRING,
     "__rev"           : value you see in Chrome under `Form Data` as a STRING
 };
+
+exports.__CONFIG_PARAM = __CONFIG_PARAM;
