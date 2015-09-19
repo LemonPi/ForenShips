@@ -10,6 +10,7 @@
 	margin: 8px;
 	padding: 4px;
 	width: 200px;
+	border-radius: 6px;
 }
 body {
 	background-color: #bebebe;
@@ -22,7 +23,9 @@ body {
 #chart {
 	width: 600px;
 	height: 400px;
+	float: left;
 	background-color: white;
+	border-radius: 6px;
 }
 #sidebar {
 	float: right;
