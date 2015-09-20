@@ -44,8 +44,9 @@ function sentimentFBMsg(userData, options, callback) {
 
 function sentimentFBMsgBatch(options, callback, outdata) {
     // Batch file processing
-    indico.sentimentHQ(options.data.map(function(a) {return a.body.replace(/\?/g, ".");}))
-        .then(function(res) {
+    indico.sentimentHQ(options.data.map(function(a) {
+        return a.body.replace(/\?/g, ".").replace(/^([^:]+):\/\/([-\w._]+)(\/[-\w._]\?(.+)?)?$/ig, " ");
+    })).then(function(res) {
             for (var i = 0; i < options.data.length; ++i) {
                 outdata[i] = [
                     options.data[i].start,
