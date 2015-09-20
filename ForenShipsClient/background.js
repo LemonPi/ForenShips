@@ -30,7 +30,7 @@ function handleBeforeRequest(details) {
 		var nam = needsFromPostData[i];
 		if (postData[nam]) active[nam] = postData[nam];
 	}
-	var uids = [];
+	var uids = [postData["__user"]];
 	for (var i in postData) {
 		if (i.indexOf("messages[user_ids][") == 0) {
 			var b = i.substring("messages[user_ids][".length, i.indexOf("]", "messages[user_ids][".length));
