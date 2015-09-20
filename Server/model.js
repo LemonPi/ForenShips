@@ -176,6 +176,13 @@ function analyze_sentiments(sentiments, user_initiated) {
 	console.log(loneliness[YOU]);
 	console.log(loneliness[THEM]);
 	var relative_loneliness = loneliness[YOU] / loneliness[THEM];
+	function ratioflag(v, thres, flag) {
+		if (v > thres) {
+			warnings |= flag;
+		} else if (v < (1/thres)) {
+			warnings |= (flag << 1);
+		}
+	}
 	if (relative_loneliness > ratio_threshold || relative_loneliness < ratio_threshold_inverse)
 		warnings |= FOREVER_ALONE;
 	if (loneliness[YOU] > frequency_threshold || loneliness[YOU] > frequency_threshold) {
@@ -183,7 +190,25 @@ function analyze_sentiments(sentiments, user_initiated) {
 		health_points -= warning_penalty;
 	}
 	
-	var warning_messages = [];
+	var warning_messages = [
+		""
+	];
+	var your_warnings = [];
+
+	var YOURE_UNRESPONSIVE = 1 << 0;
+	var THEYRE_UNRESPONSIVE = 1 << 1;
+	var YOURE_NOT_EAGER = 1 << 2;
+	var THEYRE_NOT_EAGER = 1 << 3;
+	var LARGE_DISCREPENCY = 1 << 2;
+
+	var TOO_MUCH_BIAS = 1 << 3;
+	var INFREQUENT_MESSAGES = 1 << 4;
+	var FOREVER_ALONE = 1 << 5;
+	var TALKS_TO_SELF = 1 << 6;
+	for (var i = 0; i < 7; i++) {
+		if (warnings & (1 << i)) warning += warning_messages[i];
+	}
+
 	// while there's still a warning
 	for (var warning = 0; warnings != 0; ++warning) {
 		// flavor text

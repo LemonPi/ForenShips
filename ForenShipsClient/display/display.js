@@ -7,8 +7,8 @@ var active_chart;
 var serverData;
 
 var conversationData = "{}";
-//var API_ENDPOINT = "http://forenships.co/diagnose";
-var API_ENDPOINT = "http://localhost:8000/diagnose";
+var API_ENDPOINT = "http://forenships.co/diagnose";
+// var API_ENDPOINT = "http://localhost:8000/diagnose";
 function toXYObj(o) {
 	return {x: o[0], y: o[1], body: o[2]};
 }
