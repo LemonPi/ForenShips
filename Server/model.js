@@ -100,26 +100,97 @@ function analyze_sentiments(sentiments, user_initiated) {
 	// 			bucket_sentiment[s] / bucket_e[s]]);
 	// 	}
 	// }
-/*
-	console.log(condensed_sentiments[YOU]);
-	console.log(condensed_sentiments[THEM]);
-*/
-	console.log("Eagerness");
-	console.log(eagerness[YOU]);
-	console.log(eagerness[THEM]);
 
-	console.log("Responsiveness");
-	console.log(average_over_array(responsiveness[YOU]));
-	console.log(average_over_array(responsiveness[THEM]));
-
-	console.log("Discrepency");
-	console.log(discrepency);
-
-	discrepency / num_exchanges;	// average discrepency between 0-1, 0 means you both express similar sentiments
 
 	// process different metrics into a predicted status and an overall relationship healthiness
 
-	return [50, "you are friends", condensed_sentiments, bias_history];
+	var FINE = 0;
+	var UNEQUAL_RESPONSIVENESS = 1 << 0;
+	var UNEQUAL_EAGERNESS = 1 << 1;
+	var LARGE_DISCREPENCY = 1 << 2;
+	var TOO_MUCH_BIAS = 1 << 3;
+	var INFREQUENT_MESSAGES = 1 << 4;
+	var FOREVER_ALONE = 1 << 5;
+	var TALKS_TO_SELF = 1 << 6;
+	var warnings = FINE;
+
+	// each metric contributes up to 25 health points, for total of 100
+	var health_points = 0;
+	var ppm = 25;	// points per metric
+	var warning_penalty = 10;
+
+
+	var ratio_threshold = 1.5;
+	var ratio_threshold_inverse = 1/ratio_threshold;
+	var frequency_threshold = 1000 * 60 * 60 * 24 * 7;	// 1 week on average
+	var discrepency_threshold = 0.4;
+
+	// if ratios > 1.5 or or lower than 0.66 then warnings
+
+	// ratio where 1 is you guys respond in the same amount of time
+	var your_responsiveness = average_over_array(responsiveness[YOU]);
+	var their_responsiveness = average_over_array(responsiveness[THEM]);
+	var relative_responsiveness = your_responsiveness / their_responsiveness;
+
+	console.log("Responsiveness");
+	console.log(relative_responsiveness);
+	if (relative_responsiveness > ratio_threshold || relative_responsiveness < ratio_threshold_inverse)
+		warnings |= UNEQUAL_RESPONSIVENESS;
+	if (your_responsiveness > frequency_threshold || their_responsiveness > frequency_threshold) {
+		warnings |= INFREQUENT_MESSAGES;
+		health_points -= warning_penalty;
+	}
+
+	if (relative_responsiveness > 1)
+		health_points += ppm / relative_responsiveness;	// the greater the deviation from 1, the smaller the score
+	else
+		health_points += ppm * relative_responsiveness;
+
+
+	// ratio where 1 is you guys iniate the same number of conversations
+	console.log("Eagerness");
+	console.log(eagerness[YOU]);
+	console.log(eagerness[THEM]);
+	var relative_eagerness = eagerness[YOU] / eagerness[THEM];
+	if (relative_eagerness > ratio_threshold || relative_eagerness < ratio_threshold_inverse)
+		warnings |= UNEQUAL_EAGERNESS;
+
+	if (relative_eagerness > 1)
+		health_points += ppm / relative_eagerness;
+	else
+		health_points -= ppm * relative_eagerness;
+
+
+	// average discrepency between 0-1, 0 means you both express similar sentiments
+	var avg_discrepency = discrepency / num_exchanges;	
+	console.log("Discrepency");
+	console.log(avg_discrepency);
+	if (avg_discrepency > discrepency_threshold)
+		warnings |= LARGE_DISCREPENCY;
+
+	// 0 discprency is matched and should get full score
+	health_points += ppm * (1 - avg_discrepency);
+
+
+	console.log("Loneliness");
+	console.log(loneliness[YOU]);
+	console.log(loneliness[THEM]);
+	var relative_loneliness = loneliness[YOU] / loneliness[THEM];
+	if (relative_loneliness > ratio_threshold || relative_loneliness < ratio_threshold_inverse)
+		warnings |= FOREVER_ALONE;
+	if (loneliness[YOU] > frequency_threshold || loneliness[YOU] > frequency_threshold) {
+		warnings |= TALKS_TO_SELF;
+		health_points -= warning_penalty;
+	}
+	
+	var warning_messages = [];
+	// while there's still a warning
+	for (var warning = 0; warnings != 0; ++warning) {
+		// flavor text
+		break;
+	}
+
+	return [health_points, "you are friends", condensed_sentiments, bias_history];
 }
 
 exports.analyze_sentiments = analyze_sentiments; 
