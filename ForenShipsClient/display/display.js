@@ -36,6 +36,10 @@ function addGraph(datain) {
 
 			chart.tooltip.contentGenerator(function (obj) {
 				textbody.innerHTML = obj.point.body.replace(/\n/g, "<br>")
+				// color messages based on who's message is on mouseover
+				if (obj.seriesIndex === 0) textbody.className = "mymessage";
+				else textbody.className = "";
+
 				return obj.point.y;
 			});
 
@@ -79,7 +83,7 @@ function addBiasGraph(datain) {
 		chart_bias = $(chart_bias).addClass("main-chart");
 		*/
 		chart_bias.attr("data-created", "true");
-				nv.addGraph(function() {
+		nv.addGraph(function() {
 			var chart = nv.models.lineChart();
 			chart.xAxis.axisLabel("Time")
 				.tickFormat(function(dx) {return d3.time.format("%x")(new Date(dx));});

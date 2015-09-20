@@ -39,3 +39,9 @@ body {
 #sidebar {
 	flex: 1;
 }
+#textbody {
+	color:#0099ff;	
+}
+.mymessage {
+	color:#ff9900 !important;
+}
