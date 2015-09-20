@@ -4,7 +4,7 @@ var settings = require('./settings_local');
 
 // TODO Currently limited to 2000 messages
 
-function dumpFBMsg(CONF, limit, offset) {
+function dumpFBMsg(CONF, limit, offset, callback) {
     var error_timeout = 30; // Change this to alter error timeout (seconds)
     var general_timeout = 7; // Change this to alter waiting time afetr every request (seconds)
 
@@ -63,9 +63,12 @@ function dumpFBMsg(CONF, limit, offset) {
                 objdata = JSON.parse(str_data);
                 // Extract an array of dictionaries w/ parameters
                 raw_messages = objdata["payload"]["actions"];
-                for (var i = 0; i < raw_messages.length; ++i) {
-                    console.log(raw_messages[i]["body"]);
-                }
+                //for (var i = 0; i < raw_messages.length; ++i) {
+                //    console.log(raw_messages[i]["body"]);
+                //}
+                callback(null, raw_messages);
+            } else {
+                callback(err, []);
             }
     });
     
@@ -77,4 +80,5 @@ function dumpFBMsg(CONF, limit, offset) {
     }
 }
 
-dumpFBMsg(settings.__CONFIG_PARAM, 2000, 0);
+//dumpFBMsg(settings.__CONFIG_PARAM, 2000, 0);
+exports.dumpFBMsg = dumpFBMsg;
