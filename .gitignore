@@ -1,7 +1,13 @@
+settings_local.js
 settings_local.py
 what.txt
 js-beautify
 derp
-/Messages
 msg.txt
 *.pyc
+
+out.json
+runit.sh
+
+/Messages
+/node_modules
