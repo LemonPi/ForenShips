@@ -1,5 +1,10 @@
 // model of relationship health, including key metrics and their calculations
 
+function average_over_array(array) {
+	if (array.length == 0) return 0;
+	return array.reduce(function(p, e){return p + e;}) / array.length;
+}
+
 function analyze_sentiments(sentiments, user_initiated) {
 	// returns [health_points, relationship_status, condensed sentiments] by analyzing the sentiment between two parties in a conversation
 	var YOU = 0;
@@ -18,7 +23,7 @@ function analyze_sentiments(sentiments, user_initiated) {
 	// number of times each person initiated a conversation (more eager than the other)
 	var eagerness = [0, 0];
 	// length of time between end of one person's message and your response
-	var responsiveness = [0, 0];
+	var responsiveness = [[], []];
 	// positive score means your messages are more positive than theirs
 	var bias = 0;
 	// magnitude of difference over time
@@ -53,12 +58,12 @@ function analyze_sentiments(sentiments, user_initiated) {
 		else
 			bias -= exchange[2];
 		// absolute difference in message-response sentiments
-		if (e > 1)
-			discrepency += abs(exchange[2] - sentiments[e - 1][2]);
+		if (e > 1 && sentiments[e-1][1] != 0)
+			discrepency += Math.abs(exchange[2] - sentiments[e - 1][2]);
 
 		// the time between your response and your partner's last message
-		if (e > 1)
-			responsiveness[sender] = exchange[0] - sentiments[e - 1][1];
+		if (e > 1 && sentiments[e-1][1] != 0)
+			responsiveness[sender].push(exchange[0] - sentiments[e - 1][1]);
 
 		bias_history.push([exchange[0], bias]);
 
@@ -104,11 +109,13 @@ function analyze_sentiments(sentiments, user_initiated) {
 	console.log(eagerness[THEM]);
 
 	console.log("Responsiveness");
-	console.log(responsiveness[YOU]);
-	console.log(responsiveness[THEM]);
+	console.log(average_over_array(responsiveness[YOU]));
+	console.log(average_over_array(responsiveness[THEM]));
 
 	console.log("Discrepency");
 	console.log(discrepency);
+
+	discrepency / num_exchanges;	// average discrepency between 0-1, 0 means you both express similar sentiments
 
 	// process different metrics into a predicted status and an overall relationship healthiness
 

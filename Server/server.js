@@ -22,7 +22,7 @@ function handle_request(req, res) {
 function got_sentiment(req, res, fail, sentiments, user_initiated) {
 	if (fail) {
 		console.log(fail);
-		res.end(500);
+		res.end("error");
 		return;
 	}
 	// var people = [[], []];
