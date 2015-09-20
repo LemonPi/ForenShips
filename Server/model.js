@@ -1,9 +1,12 @@
+// model of relationship health, including key metrics and their calculations
+
 function analyze_sentiments(sentiments, user_initiated) {
 	// returns [health_points, relationship_status, condensed sentiments] by analyzing the sentiment between two parties in a conversation
 	var YOU = 0;
 	var THEM = 1;
 
 	var condensed_sentiments = [[],[]];
+	var bias_history = [];
 
 	// divide sentiments into at most 30 exchanges to be plotted, but analysis should still be done on each exchange
 	var num_exchanges = sentiments.length;
@@ -16,9 +19,9 @@ function analyze_sentiments(sentiments, user_initiated) {
 	// positive score means your messages are more positive than theirs
 	var bias = 0;
 
-	var bucket_e = [0, 0];	// when over exchanges per bucket, fill bucket
-	var bucket_sentiment = [0, 0];
-	var bucket_time = [0, 0];
+	// var bucket_e = [0, 0];	// when over exchanges per bucket, fill bucket
+	// var bucket_sentiment = [0, 0];
+	// var bucket_time = [0, 0];
 
 	var sender = (user_initiated)? YOU : THEM;
 	++eagerness[sender];
@@ -35,50 +38,52 @@ function analyze_sentiments(sentiments, user_initiated) {
 		}
 
 		// scale by the freshness of exchange - the more recent the more weighted
-		loneliness[sender] += (exchange[1] - exchange[0]) * e; 
+		loneliness[sender] += (exchange[1] - exchange[0]); 
 
 		console.log("loneliness: " + loneliness[sender]);
 
 		if (sender == YOU)
-			bias += exchange[2] * e;
+			bias += exchange[2];
 		else
-			bias -= exchange[2] * e;
+			bias -= exchange[2];
+
+		bias_history.push([exchange[0], bias]);
 
 		console.log("bias: " + bias);
 
-		++bucket_e[sender];
-		// add to bucket for drawing
-		bucket_time[sender] += exchange[1] + exchange[0];	// divide by 2 when pushing into bucket
-		bucket_sentiment[sender] += exchange[2];
-		// filled bucket, start on next one
-		if (bucket_e[sender] >= bucket_sentiment[sender]) {
-			console.log(sender + " bucket filled");
-			condensed_sentiments[sender].push([ bucket_time[sender] / (2*bucket_e[sender]), 
-				bucket_sentiment[sender] / bucket_e[sender]]);
-			// clear counters for next bucket with e_in_bucket starting at 0
-			bucket_sentiment[sender] = bucket_time[sender] = bucket_e[sender] = 0;
-		}
+		// ++bucket_e[sender];
+		// // add to bucket for drawing
+		// bucket_time[sender] += exchange[1] + exchange[0];	// divide by 2 when pushing into bucket
+		// bucket_sentiment[sender] += exchange[2];
+		// // filled bucket, start on next one
+		// if (bucket_e[sender] >= bucket_sentiment[sender]) {
+		// 	console.log(sender + " bucket filled");
+		// 	condensed_sentiments[sender].push([ bucket_time[sender] / (2*bucket_e[sender]), 
+		// 		bucket_sentiment[sender] / bucket_e[sender]]);
+		// 	// clear counters for next bucket with e_in_bucket starting at 0
+		// 	bucket_sentiment[sender] = bucket_time[sender] = bucket_e[sender] = 0;
+		// }
+
+		condensed_sentiments[sender].push([exchange[0], exchange[2], exchange[3]]);
 
 		// switch sender
-		if (sender == YOU) 
-			sender = THEM;
-		else 
-			sender = YOU;
+		sender ^= 1;
+
 		console.log("sender now " + sender);
 	}
-	// any left over bucket still working on
-	for (var s = 0; s < 2; ++s) {
-		if (bucket_e[s]) {
-			console.log("left over bucket");	
-			condensed_sentiments[s].push([bucket_time[s] / (2*bucket_e[s]), 
-				bucket_sentiment[s] / bucket_e[s]]);
-		}
-	}
+	// // any left over bucket still working on
+	// for (var s = 0; s < 2; ++s) {
+	// 	if (bucket_e[s]) {
+	// 		console.log("left over bucket");	
+	// 		condensed_sentiments[s].push([bucket_time[s] / (2*bucket_e[s]), 
+	// 			bucket_sentiment[s] / bucket_e[s]]);
+	// 	}
+	// }
 
 	console.log(condensed_sentiments[YOU]);
 	console.log(condensed_sentiments[THEM]);
 
-	return [50, "you are friends", condensed_sentiments];
+	return [50, "you are friends", condensed_sentiments, bias_history];
 }
 
 exports.analyze_sentiments = analyze_sentiments; 

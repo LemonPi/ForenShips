@@ -25,28 +25,30 @@ function got_sentiment(req, res, fail, sentiments, user_initiated) {
 		res.end(500);
 		return;
 	}
-	var people = [[], []];
-	var cur = user_initiated? 0: 1;
-	for (var i = 0; i < sentiments.length; i++) {
-		var m = sentiments[i];
-		if (m[1] == 0) {
-			cur = m[0];
-		} else {
-			people[cur].push([m[0], m[2], m[3]]);
-			cur = cur ^ 1;
-		}
+	// var people = [[], []];
+	// var cur = user_initiated? 0: 1;
+	// for (var i = 0; i < sentiments.length; i++) {
+	// 	var m = sentiments[i];
+	// 	if (m[1] == 0) {
+	// 		cur = m[0];
+	// 	} else {
+	// 		people[cur].push([m[0], m[2], m[3]]);
+	// 		cur = cur ^ 1;
+	// 	}
 
-	}
+	// }
 
 	// analyze sentiments to determine your relationship status and the health of the relationship
-	var relationship_properties = [420, "oxidizize it", people];
-		//model.analyze_sentiments(sentiments, user_initiated);
+	// var relationship_properties = [420, "oxidizize it", people];
+	var relationship_properties = model.analyze_sentiments(sentiments, user_initiated);
 
 
 	var relationship_response_json = JSON.stringify({
 		health_points: relationship_properties[0],
 		relationship_status: relationship_properties[1],
-		data: relationship_properties[2]
+		data: relationship_properties[2],
+		bias: relationship_properties[3]
+
 	});
 
 	res.end(relationship_response_json);

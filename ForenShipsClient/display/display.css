@@ -23,15 +23,18 @@ body {
 	border-radius: 4px;
 }
 
-#chart svg {
+.main-chart svg {
 	/*width: 600px;*/
 	height: 400px;
 }
-#chart {
+.main-chart {
 	height: 400px;
 	flex: 2;
 	background-color: white;
 	border-radius: 6px;
+}
+.hidden-chart {
+	display: none;
 }
 #sidebar {
 	flex: 1;
