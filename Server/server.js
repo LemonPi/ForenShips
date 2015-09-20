@@ -1,4 +1,4 @@
-// var dumper = require('./dumper.js');
+var dumper = require('../analyser.js');
 
 var http = require('http');
 var dispatcher = require('httpdispatcher');
@@ -26,7 +26,12 @@ function got_sentiment(req, res, fail, sentiments, user_initiated) {
 	}
 
 	// analyze sentiments to determine your relationship status and the health of the relationship
-	var relationship_properties = analyze_sentiments(sentiments, user_initiated);
+	var relationship_properties = [420, "oxidizize it",
+		[
+			sentiments.filter(function(a) {return a[1] != 0;}).map(function(a) { return [a[0], a[2]]}),
+			[]
+		]];
+		//analyze_sentiments(sentiments, user_initiated);
 
 
 	var relationship_response_json = JSON.stringify({
@@ -52,7 +57,8 @@ dispatcher.onGet("/diagnose", function(req, res) {
 	// two lists of (time start, time end, sentiment) tuples where time is sec since epoch and sentiment is float
 	// each tuple is a continguous message "exchange" from one side; the two lists' length should differ by at most 1
 	// dumper.getMergedFBMsg(user_data, 2000, 0, got_sentiment.bind(null, req, res));
-	got_sentiment(req, res, false, [[1,2,0.5],[2,3,0.7],[0,0,null],[4,7,0.1],[8,10,0.3]], true);
+	//got_sentiment(req, res, false, [[1,2,0.5],[2,3,0.7],[0,0,null],[4,7,0.1],[8,10,0.3]], true);
+	dumper.testFromFile(got_sentiment.bind(null, req, res));
 
 });
 

@@ -3,6 +3,7 @@
     "version" : "1.0.0",
     "dependencies" : {
         "urllib" : "2.4.0",
-        "indico.io" : "0.4.2"
+        "indico.io" : "0.4.2",
+        "httpdispatcher": "0.4.0"
     }
 }

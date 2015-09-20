@@ -1,6 +1,6 @@
 var urllib = require('urllib');
 
-var settings = require('./settings_local');
+//var settings = require('./settings_local');
 
 // TODO Currently limited to 2000 messages
 

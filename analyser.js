@@ -49,11 +49,11 @@ function sentimentFBMsgOne(userdata, options, callback, outdata, index) {
     }
     indico.sentiment(options.data[index].body)
         .then(function(res) {
-            outdata[index] = {
-                "start": options.data[index].start,
-                "end": options.data[index].end,
-                "sentiment": 1 - res['sentiment']
-            }
+            outdata[index] = [
+                options.data[index].start,
+                options.data[index].end,
+                1 - res[i]
+            ]
         }).catch(function(res) {
             console.log(res);
             callback(res, [], false);
@@ -63,7 +63,7 @@ function sentimentFBMsgOne(userdata, options, callback, outdata, index) {
 
 function sentimentFBMsgBatch(options, callback, outdata) {
     // Batch file processing
-    indico.sentimentHQ(options.data.map(function(a) {return a.body}), indico.apiKey)
+    indico.sentimentHQ(options.data.map(function(a) {return a.body}))
         .then(function(res) {
             for (var i = 0; i < options.data.length; ++i) {
                 outdata[i] = [
@@ -102,18 +102,19 @@ function getMergedFBMsgImpl_(userData, limit, offset, callback, tries) {
 
 exports.getMergedFBMsg = mergeFBMsg;
 
-function testFromFile() {
+function testFromFile(customCallback) {
     var buf = fs.readFileSync("out.json", {encoding: "UTF-8"});
     var data = JSON.parse(buf);
     var userData = {uids: ["0"]};
     var merged = mergeFBMsg(userData, data);
     //console.log(merged);
     //return;
-    sentimentFBMsg(userData, merged, function(error, data, userInitiated) {
+    sentimentFBMsg(userData, merged, customCallback? customCallback: function(error, data, userInitiated) {
         console.log(error);
         console.log(data);
         console.log(userInitiated);
     });
 }
+exports.testFromFile = testFromFile;
 
-testFromFile();
+//testFromFile();
