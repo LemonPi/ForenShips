@@ -1,6 +1,6 @@
 "use strict";
 var conversationData = "{}";
-var API_ENDPOINT = "http://localhost:8000/sample_data.json";
+var API_ENDPOINT = "http://localhost:8000/diagnose";
 function toXYObj(o) {
 	return {x: o[0], y: o[1]};
 }
@@ -10,6 +10,13 @@ function addGraph(datain) {
 		chart.xAxis.axisLabel("Time")
 			.tickFormat(function(dx) {return d3.time.format("%x")(new Date(dx));});
 		chart.yAxis.axisLabel("Axis 1");
+
+
+		chart.tooltip.contentGenerator(function (obj) { 
+			return JSON.stringify(obj);
+		});
+
+
 		var data = [{
 			values: datain.data[0].map(toXYObj),
 			key: "Received",
