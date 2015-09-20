@@ -25,7 +25,7 @@ function mergeFBMsg(userData, data) {
             cur = {"start": m.timestamp, "body": m.body};
             lastSender = m.author;
         } else {
-            cur.body += " " + m.body;
+            cur.body += "\n" + m.body;
         }
     }
     if (cur) {
@@ -42,34 +42,16 @@ function sentimentFBMsg(userData, options, callback) {
     sentimentFBMsgBatch(options, callback, outdata);
 }
 
-function sentimentFBMsgOne(userdata, options, callback, outdata, index) {
-    if (index == options.data.length) {
-        callback(null, outdata, options.userInitiated);
-        return;
-    }
-    indico.sentiment(options.data[index].body)
-        .then(function(res) {
-            outdata[index] = [
-                options.data[index].start,
-                options.data[index].end,
-                1 - res[i]
-            ]
-        }).catch(function(res) {
-            console.log(res);
-            callback(res, [], false);
-        });
-    sentimentFBMsgOne(userdata, options, callback, outdata, index + 1);
-}
-
 function sentimentFBMsgBatch(options, callback, outdata) {
     // Batch file processing
-    indico.sentimentHQ(options.data.map(function(a) {return a.body}))
+    indico.sentimentHQ(options.data.map(function(a) {return a.body.replace(/\?/g, ".");}))
         .then(function(res) {
             for (var i = 0; i < options.data.length; ++i) {
                 outdata[i] = [
                     options.data[i].start,
                     options.data[i].end,
-                    1 - res[i]
+                    res[i],
+                    options.data[i].body
                 ]
             }
             callback(null, outdata, options.userInitiated);
@@ -85,7 +67,12 @@ function getMergedFBMsg(userData, limit, offset, callback) {
     getMergedFBMsgImpl_(userData, limit, offset, callback, 2);
 }
 function getMergedFBMsgImpl_(userData, limit, offset, callback, tries) {
-    dumper.dumpFBMsg(userdata, limit, offset, function(fail, data) {
+    var newData = {
+        cookie: userData.Cookie,
+        conversation_id: userData.uids[1]
+    }
+    for (var i in userData) newData[i] = userData[i];
+    dumper.dumpFBMsg(newData, limit, offset, function(fail, data) {
         if (fail) {
             if (tries == 0) {
                 callback(fail, [], false);
@@ -100,12 +87,12 @@ function getMergedFBMsgImpl_(userData, limit, offset, callback, tries) {
     })
 }
 
-exports.getMergedFBMsg = mergeFBMsg;
+exports.getMergedFBMsg = getMergedFBMsg;
 
 function testFromFile(customCallback) {
     var buf = fs.readFileSync("out.json", {encoding: "UTF-8"});
     var data = JSON.parse(buf);
-    var userData = {uids: ["0"]};
+    var userData = {uids: ["100000145591601"]};
     var merged = mergeFBMsg(userData, data);
     //console.log(merged);
     //return;

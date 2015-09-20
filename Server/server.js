@@ -31,7 +31,7 @@ function got_sentiment(req, res, fail, sentiments, user_initiated) {
 		if (m[1] == 0) {
 			cur = m[0];
 		} else {
-			people[cur].push([m[0], m[2]]);
+			people[cur].push([m[0], m[2], m[3]]);
 			cur = cur ^ 1;
 		}
 
@@ -64,9 +64,9 @@ dispatcher.onGet("/diagnose", function(req, res) {
 
 	// two lists of (time start, time end, sentiment) tuples where time is sec since epoch and sentiment is float
 	// each tuple is a continguous message "exchange" from one side; the two lists' length should differ by at most 1
-	// dumper.getMergedFBMsg(user_data, 2000, 0, got_sentiment.bind(null, req, res));
+	dumper.getMergedFBMsg(user_data, 2000, 0, got_sentiment.bind(null, req, res));
 	//got_sentiment(req, res, false, [[1,2,0.5],[2,3,0.7],[0,0,null],[4,7,0.1],[8,10,0.3]], true);
-	dumper.testFromFile(got_sentiment.bind(null, req, res));
+	//dumper.testFromFile(got_sentiment.bind(null, req, res));
 
 });
 

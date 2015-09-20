@@ -1,10 +1,14 @@
 "use strict";
+
+
 var conversationData = "{}";
 var API_ENDPOINT = "http://localhost:8000/diagnose";
 function toXYObj(o) {
-	return {x: o[0], y: o[1]};
+	return {x: o[0], y: o[1], body: o[2]};
 }
 function addGraph(datain) {
+	var textbody = document.getElementById("textbody");
+
 	nv.addGraph(function() {
 		var chart = nv.models.lineChart();
 		chart.xAxis.axisLabel("Time")
@@ -12,8 +16,9 @@ function addGraph(datain) {
 		chart.yAxis.axisLabel("Axis 1");
 
 
-		chart.tooltip.contentGenerator(function (obj) { 
-			return JSON.stringify(obj);
+		chart.tooltip.contentGenerator(function (obj) {
+			textbody.innerHTML = obj.point.body.replace(/\n/g, "<br>")
+			return obj.point.y;
 		});
 
 
