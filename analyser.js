@@ -1,10 +1,9 @@
 var dumper = require("./dumper");
 var fs = require("fs");
-//var indico = require("indico.co");
-var indico = null;
+var indico = require("indico.io");
 var HOURS_TO_MILLIS = 1000 * 60 * 60;
 
-//indico.apiKey = process.env.INDICO_KEY;
+indico.apiKey = process.env.INDICO_KEY;
 
 function mergeFBMsg(userData, data) {
     var out = [];
@@ -40,7 +39,7 @@ function mergeFBMsg(userData, data) {
 
 function sentimentFBMsg(userData, options, callback) {
     var outdata = new Array(options.data.length);
-    sentimentFBMsgOne(userData, options, callback, outdata, 0);
+    sentimentFBMsgBatch(options, callback, outdata);
 }
 
 function sentimentFBMsgOne(userdata, options, callback, outdata, index) {
@@ -61,6 +60,25 @@ function sentimentFBMsgOne(userdata, options, callback, outdata, index) {
         });
     sentimentFBMsgOne(userdata, options, callback, outdata, index + 1);
 }
+
+function sentimentFBMsgBatch(options, callback, outdata) {
+    // Batch file processing
+    indico.sentimentHQ(options.data.map(function(a) {return a.body}), indico.apiKey)
+        .then(function(res) {
+            for (var i = 0; i < options.data.length; ++i) {
+                outdata[i] = [
+                    options.data[i].start,
+                    options.data[i].end,
+                    1 - res[i]
+                ]
+            }
+            callback(null, outdata, options.userInitiated);
+        }).catch(function(res){
+            console.log(res);
+            callback(res, [], false);
+    });
+}
+
 
 // callback: (error, data, userInitiated)
 function getMergedFBMsg(userData, limit, offset, callback) {
@@ -89,11 +107,11 @@ function testFromFile() {
     var data = JSON.parse(buf);
     var userData = {uids: ["0"]};
     var merged = mergeFBMsg(userData, data);
-    console.log(merged);
-    return;
+    //console.log(merged);
+    //return;
     sentimentFBMsg(userData, merged, function(error, data, userInitiated) {
         console.log(error);
-        //console.log(data);
+        console.log(data);
         console.log(userInitiated);
     });
 }

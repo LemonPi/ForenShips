@@ -6,5 +6,8 @@ derp
 msg.txt
 *.pyc
 
+out.json
+runit.sh
+
 /Messages
 /node_modules
