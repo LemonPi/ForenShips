@@ -19,11 +19,11 @@ function addGraph(datain) {
 
 		var data = [{
 			values: datain.data[0].map(toXYObj),
-			key: "Received",
+			key: "Sent",
 			color: "#ff9900"
 			}, {
 			values: datain.data[1].map(toXYObj),
-			key: "Sent",
+			key: "Received",
 			color: "#0099ff"
 			}];
 		console.log(JSON.stringify(data));

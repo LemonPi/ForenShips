@@ -24,13 +24,21 @@ function got_sentiment(req, res, fail, sentiments, user_initiated) {
 		res.end(500);
 		return;
 	}
+	var people = [[], []];
+	var cur = user_initiated? 0: 1;
+	for (var i = 0; i < sentiments.length; i++) {
+		var m = sentiments[i];
+		if (m[1] == 0) {
+			cur = m[0];
+		} else {
+			people[cur].push([m[0], m[2]]);
+			cur = cur ^ 1;
+		}
+
+	}
 
 	// analyze sentiments to determine your relationship status and the health of the relationship
-	var relationship_properties = [420, "oxidizize it",
-		[
-			sentiments.filter(function(a) {return a[1] != 0;}).map(function(a) { return [a[0], a[2]]}),
-			[]
-		]];
+	var relationship_properties = [420, "oxidizize it", people];
 		//analyze_sentiments(sentiments, user_initiated);
 
 
