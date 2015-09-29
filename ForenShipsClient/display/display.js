@@ -7,10 +7,10 @@ var active_chart;
 var serverData;
 
 var conversationData = "{}";
-var API_ENDPOINT = "http://forenships.co/diagnose";
-// var API_ENDPOINT = "http://localhost:8000/diagnose";
+// var API_ENDPOINT = "http://forenships.co/diagnose";
+var API_ENDPOINT = "http://localhost:8000/diagnose";
 function toXYObj(o) {
-	return {x: o[0], y: o[1], body: o[2]};
+	return {x: o[0], y: o[1], size: o[2].length, body: o[2]};
 }
 function addGraph(datain) {
 	var chart_sentiments = $($(interface_container).find('#chart')[0]);
@@ -29,11 +29,12 @@ function addGraph(datain) {
 		chart_sentiments = $(chart_sentiments).addClass("main-chart");*/
 		chart_sentiments.attr("data-created", "true");
 		nv.addGraph(function() {
-			var chart = nv.models.lineChart();
+			var chart = nv.models.scatterChart();
+			chart.showDistX(true);
 			chart.xAxis.axisLabel("Time")
 				.tickFormat(function(dx) {return d3.time.format("%x")(new Date(dx));});
 			chart.yAxis.axisLabel("Sentiment");
-
+			chart.forceY([0,1]);
 
 			chart.tooltip.contentGenerator(function (obj) {
 				textbody.innerHTML = obj.point.body.replace(/\n/g, "<br>")
@@ -88,7 +89,7 @@ function addBiasGraph(datain) {
 			var chart = nv.models.lineChart();
 			chart.xAxis.axisLabel("Time")
 				.tickFormat(function(dx) {return d3.time.format("%x")(new Date(dx));});
-			chart.yAxis.axisLabel("Bias");		
+			chart.yAxis.axisLabel("Bias");	
 
 			var data = [{
 				values: datain.bias.map(toBiasObj),
@@ -111,7 +112,7 @@ function loadedConversation(data) {
 	$("#interface-container").show();
 	console.log(data);
 	$("#health-points").text(data.health_points);
-	$("#relationship-status").text(data.relationship_status);
+	$("#relationship-status").html(data.relationship_status);
 	serverData = data;
 	addGraph(data);
 }

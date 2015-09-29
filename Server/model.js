@@ -106,22 +106,56 @@ function analyze_sentiments(sentiments, user_initiated) {
 
 	var FINE = 0;
 	var UNEQUAL_RESPONSIVENESS = 1 << 0;
-	var UNEQUAL_EAGERNESS = 1 << 1;
-	var LARGE_DISCREPENCY = 1 << 2;
-	var TOO_MUCH_BIAS = 1 << 3;
-	var INFREQUENT_MESSAGES = 1 << 4;
-	var FOREVER_ALONE = 1 << 5;
-	var TALKS_TO_SELF = 1 << 6;
+	var UNEQUAL_EAGERNESS = 1 << 2;
+	var LARGE_DISCREPENCY = 1 << 4;
+	var TOO_MUCH_BIAS = 1 << 6;
+	var INFREQUENT_MESSAGES = 1 << 8;
+	var FOREVER_ALONE = 1 << 10;
+	var TALKS_TO_SELF = 1 << 12;
 	var warnings = FINE;
-
-	// each metric contributes up to 25 health points, for total of 100
+	var warning_messages = [
+		"You take a long time to respond to your friend's messages",
+		"Your friend takes a long time to respond to your messages",
+		"You start a lot more conversations than your friend",
+		"Your friend starts a lot more conversations than you",
+		// large discrepency is mutual, so there is only 1 value
+		"Your sentiments are often at odds",
+		"",
+		// too much bias
+		"You don't message your friend often even",
+		"Your friend doens't talk to you much",
+		// forever alone
+		"You're forever alone...",
+		"You often leave your friend hanging",
+		// talks to yourself
+		"Your friend often leaves you talking to yourself",
+		"Your friend often rambles on by themselves"
+	];
+	// each metric up to ppm points
 	var health_points = 0;
-	var ppm = 25;	// points per metric
-	var warning_penalty = 10;
+	var ppm = 35;	// points per metric
+	var warning_penalty = 5;
+
+	function ratioflag(v, thres, flag) {
+		if (v > thres) {
+			warnings |= flag;
+		} else if (v < (1/thres)) {
+			warnings |= (flag << 1);
+		}
+	};
+	function valueflag(v2, thres, flag, penalty) {
+		if (v2[0] > thres) {
+			warnings |= flag;
+			health_points -= penalty;
+		}
+		if (v2[1] > thres) {
+			warnings |= (flag << 1);
+			health_points -= penalty;
+		}
+	};
 
 
-	var ratio_threshold = 1.5;
-	var ratio_threshold_inverse = 1/ratio_threshold;
+	var ratio_threshold = 2;
 	var frequency_threshold = 1000 * 60 * 60 * 24 * 7;	// 1 week on average
 	var discrepency_threshold = 0.4;
 
@@ -134,12 +168,9 @@ function analyze_sentiments(sentiments, user_initiated) {
 
 	console.log("Responsiveness");
 	console.log(relative_responsiveness);
-	if (relative_responsiveness > ratio_threshold || relative_responsiveness < ratio_threshold_inverse)
-		warnings |= UNEQUAL_RESPONSIVENESS;
-	if (your_responsiveness > frequency_threshold || their_responsiveness > frequency_threshold) {
-		warnings |= INFREQUENT_MESSAGES;
-		health_points -= warning_penalty;
-	}
+	ratioflag(relative_responsiveness, ratio_threshold, UNEQUAL_RESPONSIVENESS);
+	valueflag([your_responsiveness, their_responsiveness], frequency_threshold, INFREQUENT_MESSAGES, warning_penalty);
+
 
 	if (relative_responsiveness > 1)
 		health_points += ppm / relative_responsiveness;	// the greater the deviation from 1, the smaller the score
@@ -152,8 +183,7 @@ function analyze_sentiments(sentiments, user_initiated) {
 	console.log(eagerness[YOU]);
 	console.log(eagerness[THEM]);
 	var relative_eagerness = eagerness[YOU] / eagerness[THEM];
-	if (relative_eagerness > ratio_threshold || relative_eagerness < ratio_threshold_inverse)
-		warnings |= UNEQUAL_EAGERNESS;
+	ratioflag(relative_eagerness, ratio_threshold, UNEQUAL_EAGERNESS);
 
 	if (relative_eagerness > 1)
 		health_points += ppm / relative_eagerness;
@@ -165,6 +195,7 @@ function analyze_sentiments(sentiments, user_initiated) {
 	var avg_discrepency = discrepency / num_exchanges;	
 	console.log("Discrepency");
 	console.log(avg_discrepency);
+
 	if (avg_discrepency > discrepency_threshold)
 		warnings |= LARGE_DISCREPENCY;
 
@@ -176,37 +207,17 @@ function analyze_sentiments(sentiments, user_initiated) {
 	console.log(loneliness[YOU]);
 	console.log(loneliness[THEM]);
 	var relative_loneliness = loneliness[YOU] / loneliness[THEM];
-	function ratioflag(v, thres, flag) {
-		if (v > thres) {
-			warnings |= flag;
-		} else if (v < (1/thres)) {
-			warnings |= (flag << 1);
-		}
-	}
-	if (relative_loneliness > ratio_threshold || relative_loneliness < ratio_threshold_inverse)
-		warnings |= FOREVER_ALONE;
-	if (loneliness[YOU] > frequency_threshold || loneliness[YOU] > frequency_threshold) {
-		warnings |= TALKS_TO_SELF;
-		health_points -= warning_penalty;
-	}
+
+	ratioflag(relative_loneliness, ratio_threshold, FOREVER_ALONE);
+	valueflag(loneliness, frequency_threshold, TALKS_TO_SELF, warning_penalty);
+
 	
-	var warning_messages = [
-		""
-	];
+
 	var your_warnings = [];
 
-	var YOURE_UNRESPONSIVE = 1 << 0;
-	var THEYRE_UNRESPONSIVE = 1 << 1;
-	var YOURE_NOT_EAGER = 1 << 2;
-	var THEYRE_NOT_EAGER = 1 << 3;
-	var LARGE_DISCREPENCY = 1 << 2;
-
-	var TOO_MUCH_BIAS = 1 << 3;
-	var INFREQUENT_MESSAGES = 1 << 4;
-	var FOREVER_ALONE = 1 << 5;
-	var TALKS_TO_SELF = 1 << 6;
-	for (var i = 0; i < 7; i++) {
-		if (warnings & (1 << i)) warning += warning_messages[i];
+	for (var i = 0; warnings != 0; i++) {
+		if ((warnings & 1) == 1) your_warnings.push(warning_messages[i]);
+		warnings >>= 1;
 	}
 
 	// while there's still a warning
@@ -215,7 +226,12 @@ function analyze_sentiments(sentiments, user_initiated) {
 		break;
 	}
 
-	return [health_points, "you are friends", condensed_sentiments, bias_history];
+	if (your_warnings.length === 0)
+		your_warnings = "You're just friends";
+	else
+		your_warnings = your_warnings.join("<br>");
+
+	return [Math.floor(health_points * 100) / 100, your_warnings, condensed_sentiments, bias_history];
 }
 
 exports.analyze_sentiments = analyze_sentiments; 

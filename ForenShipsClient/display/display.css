@@ -1,7 +1,7 @@
 body {
 	font-family: Arial, sans-serif;
-	width: 900px;
-	height: 420px;
+	width: 1200px;
+	height: 560px;
 	overflow-x:hidden;
 }
 
@@ -25,10 +25,10 @@ body {
 
 .main-chart svg {
 	/*width: 600px;*/
-	height: 400px;
+	height: 480px;
 }
 .main-chart {
-	height: 400px;
+	height: 480px;
 	flex: 2;
 	background-color: white;
 	border-radius: 6px;
@@ -38,6 +38,7 @@ body {
 }
 #sidebar {
 	flex: 1;
+	margin-right:20%;
 }
 #textbody {
 	color:#0099ff;	
