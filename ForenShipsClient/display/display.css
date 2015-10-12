@@ -1,7 +1,7 @@
 body {
 	font-family: Arial, sans-serif;
-	width: 1200px;
-	height: 560px;
+	width: 800px;
+	height: 576px;
 	overflow-x:hidden;
 }
 
@@ -18,7 +18,7 @@ body {
 .card {
 	margin: 8px;
 	padding: 4px;
-	width: 200px;
+	width: 170px;
 	border: 1px solid #bebebe;
 	border-radius: 4px;
 }
@@ -29,7 +29,6 @@ body {
 }
 .main-chart {
 	height: 480px;
-	flex: 2;
 	background-color: white;
 	border-radius: 6px;
 }
@@ -37,12 +36,65 @@ body {
 	display: none;
 }
 #sidebar {
-	flex: 1;
-	margin-right:20%;
+	display:flex;
+	flex-direction:column;
+	margin-left:-70px;
 }
 #textbody {
 	color:#0099ff;	
 }
 .mymessage {
 	color:#ff9900 !important;
+}
+
+
+.mp {
+	fill:#ff9900;
+	stroke:#ff9900;
+	fill-opacity:0.7;
+	stroke-width:2;
+}
+.tp {
+	fill:#0099ff;
+	stroke:#0099ff;
+	fill-opacity:0.7;
+	stroke-width:2;
+}
+.tp:hover, .mp:hover {
+	fill-opacity:1;
+	stroke-width:9;
+}
+
+.tooltip {
+	position: absolute;
+	text-align: center;
+	height:20px;
+	border:1px solid black;
+	border-radius: 5px;
+	padding:4px;
+	font: 15px calibri;
+	opacity:0.8;
+	background: white;
+}
+
+.tick line {
+	opacity: 0.2;
+}
+
+.axis path,
+.axis line {
+	fill: none;
+	stroke: black;
+	shape-rendering: crispEdges;
+}
+.axis text {
+	font-family: sans-serif;
+	font-size:11px;
+}
+
+.btn {
+	text-align:center;
+	cursor:pointer;
+	font-size:14px;
+	color:rgb(66, 180, 230);
 }
