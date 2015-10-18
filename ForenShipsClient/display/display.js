@@ -4,6 +4,10 @@ var textbody;
 var interface_container;
 var active_chart;
 
+// tooltip
+var time_tooltip_format = d3.time.format("%a %I:%M%p");
+var tip;
+
 var serverData;
 
 var conversationData = "{}";
@@ -13,6 +17,11 @@ var API_ENDPOINT = "http://localhost:8080/sampleout.json";	// sample data
 
 function epochTimeConverter(unixEpochTime) {
     return new Date(unixEpochTime);
+}
+function epoch_to_date(data) {
+	for (var i = 0; i < data.length; ++i) {
+		data[i][0] = epochTimeConverter(data[i][0]);
+	}	
 }
 function toXYObj(o) {
 	return {x: o[0], y: o[1], size: o[2].length, body: o[2]};
@@ -71,6 +80,135 @@ function legend() {
 
 }
 
+function chart() {
+	var w = 680;
+	var h = 500;
+	var padding = 40;
+
+	var ylabel = "";
+
+	var xdomain = [0,1];
+	var ydomain = [0,1];
+
+	var yrange = [0,1];
+
+	var xscale;
+	var yscale;
+
+	var xaxis;
+	var yaxis;
+
+	var actual_xaxis;
+	var actual_yaxis;
+
+	var svg;
+
+    var redraw_chart = function() {
+    	svg.selectAll(".point")
+    		.attr("cx", function(d){return xscale(d[0]);});
+    }
+
+	function ch(svgselection) {
+		svg = d3.select(svgselection)
+            .attr("width", w) 
+            .attr("height", h);
+        // scales (y between 0 - 1) (x is time)
+        yscale = d3.scale.linear()
+        	.domain(ydomain)
+        	.range([h-padding,padding]);
+
+        xscale = d3.time.scale()
+        	.domain(xdomain)
+        	.range([padding,w-padding]);
+
+        // axes
+        xaxis = d3.svg.axis()
+        	.scale(xscale)
+        	.orient("bottom")
+        	.innerTickSize(-h+2*padding)
+        	.ticks(5);
+
+        yaxis = d3.svg.axis()
+        	.scale(yscale)
+        	.innerTickSize(-w+2*padding)
+        	.orient("left");
+
+       	// axis labels
+       	svg.append("text")
+       		.attr("text-anchor","middle")
+       		.attr("transform", "translate("+ 1.2*padding +"," + (1.4*padding + 2.6*ylabel.length) +"),rotate(90)")
+       		.text(ylabel);
+
+        return svg;
+	}
+	ch.draw_axis = function() {
+        actual_xaxis = svg.append("g")
+	        .attr("class", "axis")
+	        .attr("transform", "translate(0," + (h-padding) + ")")
+        	.call(xaxis);
+        actual_yaxis = svg.append("g")
+        	.attr("class", "axis")
+        	.attr("transform", "translate(" + padding + ",0)")
+        	.call(yaxis);	
+        // zoom on x axis
+        var xzoom = d3.behavior.zoom()
+        	.x(xscale)
+        	.scaleExtent([1,100000])
+        	.on("zoom", function() {
+        		actual_xaxis.call(xaxis);
+        		redraw_chart();
+        	});
+        xzoom(svg);
+	}
+    ch.w = function(value) {
+    	if (!arguments.length) return w;
+    	w = value;
+    	return ch;
+    }
+    ch.h = function(value) {
+    	if (!arguments.length) return h;
+    	h = value;
+    	return ch;
+    }
+    ch.padding = function(value) {
+    	if (!arguments.length) return padding;
+    	padding = value;
+    	return ch;
+    }
+    ch.xdomain = function(value) {
+    	if (!arguments.length) return xdomain;
+    	xdomain = value;
+    	return ch;
+    }
+    ch.ydomain = function(value) {
+    	if (!arguments.length) return ydomain;
+    	ydomain = value;
+    	return ch;
+    }
+    ch.xscale = function(value) {
+    	if (!arguments.length) return xscale;
+    	xscale = value;
+    	return ch;
+    }    
+    ch.yscale = function(value) {
+    	if (!arguments.length) return yscale;
+    	yscale = value;
+    	return ch;
+    }     
+    ch.ylabel = function(value) {
+    	if (!arguments.length) return ylabel;
+    	ylabel = value;
+    	return ch;
+    } 
+    ch.redraw_chart = function(value) {
+    	if (!arguments.length) return redraw_chart;
+    	redraw_chart = value;
+    	return ch;
+    }
+
+    return ch;
+}
+
 function addGraph(datain) {
 	var chart_sentiments = $($(interface_container).find('#chart')[0]);
 	chart_sentiments.removeClass("hidden-chart");
@@ -83,55 +221,19 @@ function addGraph(datain) {
 
 		var mine = serverData.data[0];
 		var them = serverData.data[1];
-		for (var i = 0; i < mine.length; ++i) {
-			mine[i][0] = epochTimeConverter(mine[i][0]);
-		}
-		for (var i = 0; i < them.length; ++i) {
-			them[i][0] = epochTimeConverter(them[i][0]);
-		}
-		// console.log(mine);
+		epoch_to_date(mine);
+		epoch_to_date(them);
 
-		var w = 680;
-		var h = 500;
-		var padding = 40;
+        var xdomain = [Math.min(them[0][0],mine[0][0]), Math.max(them[them.length-1][0],mine[mine.length-1][0])];
 
-		var svg = d3.select("#chart svg")
-            .attr("width", w) 
-            .attr("height", h);
+        var my_chart = chart()
+        	.xdomain(xdomain)
+        	.ylabel("sentiment");
+        // generate chart (without data)
+        var svg = my_chart("#chart svg");
 
-        // scales (y between 0 - 1) (x is time)
-        var yscale = d3.scale.linear()
-        	.domain([0,1])
-        	.range([h-padding,padding]);
-
-        var xscale = d3.time.scale()
-        	.domain([Math.min(them[0][0],mine[0][0]), Math.max(them[them.length-1][0],mine[mine.length-1][0])])
-        	.range([padding,w-padding]);
-
-        // axes
-        var xaxis = d3.svg.axis()
-        	.scale(xscale)
-        	.orient("bottom")
-        	.innerTickSize(-h+2*padding)
-        	.ticks(5);
-
-        var yaxis = d3.svg.axis()
-        	.scale(yscale)
-        	.innerTickSize(-w+2*padding)
-        	.orient("left");
-
-
-
-        function redraw_chart() {
-        	svg.selectAll(".point")
-        		.attr("cx", function(d){return xscale(d[0]);});
-        }
-
-        // time tooltips
-        var time_tooltip_format = d3.time.format("%a %I:%M%p");
-        var tip = d3.select("body").append("div")
-        	.attr("class", "tooltip")
-        	.style("visibility","hidden");
+        var xscale = my_chart.xscale();
+        var yscale = my_chart.yscale();
 
         var sentmsg = svg.selectAll(".sentmsg")
         	.data(mine)
@@ -173,25 +275,7 @@ function addGraph(datain) {
         		})
         	.on("mouseout", function(d) {tip.style("visibility","hidden");});
 
-        // draw axes
-        var actual_xaxis = svg.append("g")
-	        .attr("class", "axis")
-	        .attr("transform", "translate(0," + (h-padding) + ")")
-        	.call(xaxis);
-        var actual_yaxis = svg.append("g")
-        	.attr("class", "axis")
-        	.attr("transform", "translate(" + padding + ",0)")
-        	.call(yaxis);
-
-        // zoom on x axis
-        var xzoom = d3.behavior.zoom()
-        	.x(xscale)
-        	.scaleExtent([1,100000])
-        	.on("zoom", function() {
-        		actual_xaxis.call(xaxis);
-        		redraw_chart();
-        	});
-        xzoom(svg);
+        my_chart.draw_axis();
 
         // legend
         // first element are classes to append (to give colour) and second is text to display
@@ -213,39 +297,83 @@ function toBiasObj(o) {
 function addBiasGraph(datain) {
 	var chart_bias = $($(interface_container).find('#chart_bias')[0]);
 	chart_bias.removeClass("hidden-chart");
-	if (chart_bias.attr("created")) {
+	if (chart_bias.attr("data-created")) {
 		// already exists, just change visibilities
 	}
 	else {
-		/*
-		chart_bias = document.createElement("div");
-		chart_bias.id = "chart_bias";
-		chart_bias.class = "main-chart";
-		var svgElem = document.createElement("svg");
-		svgElem.height = 400;
-		chart_bias.appendChild(svgElem);
-		interface_container.appendChild(chart_bias, 0);
-		chart_bias = $(chart_bias).addClass("main-chart");
-		*/
 		chart_bias.attr("data-created", "true");
-		nv.addGraph(function() {
-			var chart = nv.models.lineChart();
-			chart.xAxis.axisLabel("Time")
-				.tickFormat(function(dx) {return d3.time.format("%x")(new Date(dx));});
-			chart.yAxis.axisLabel("Bias");	
 
-			var data = [{
-				values: datain.bias.map(toBiasObj),
-				key: "Relationship bias",
-				color: "#0099ff"
-			}];
-			console.log(JSON.stringify(data));
-			d3.select("#chart_bias svg").datum(data).call(chart);
-		});
+        var biases = datain.bias;
+		epoch_to_date(biases);
+		var min_bias = biases[0][1];
+		var max_bias = biases[0][1];
+		for (var i = 1; i < biases.length; ++i) {
+			if (biases[i][1] < min_bias)
+				min_bias = biases[i][1];
+			else if (biases[i][1] > max_bias)
+				max_bias = biases[i][1];
+		}
+		min_bias = Math.floor(min_bias);
+		max_bias = Math.ceil(max_bias);
+
+        var my_chart = chart()
+        	.ylabel("bias (positive means you try harder)")
+        	.xdomain([biases[0][0], biases[biases.length-1][0]])
+        	.ydomain([min_bias, max_bias]);
+        // generate chart (without data)
+        var svg = my_chart("#chart_bias svg");
+
+        var xscale = my_chart.xscale();
+        var yscale = my_chart.yscale();
+        
+        var totalbiases = svg.selectAll(".biaspts")
+        	.data(biases)
+        	.enter()
+        	.append("circle")
+        	.attr("class", "their point")	// my points
+        	.attr("cx", function(d) {return xscale(d[0]);})
+        	.attr("cy", function(d) {return yscale(d[1]);})
+        	.attr("r", 4)
+        	.on("mouseover", function(d){
+        		// make tool tip
+        		tip.style("visibility","visible");
+        		tip.html(time_tooltip_format(d[0]) + " bias: <b>" + d[1].toFixed(2) +"</b>")
+        			.style("left", d3.event.pageX + 20 + "px")
+        			.style("top", (d3.event.pageY - 10) + "px");
+        		})
+        	.on("mouseout", function(d) {tip.style("visibility","hidden");});
+
+        my_chart.draw_axis();
+
+		var line_func = d3.svg.line()
+        	.x(function(d){return xscale(d[0]);})
+        	.y(function(d){return yscale(d[1]);})
+        	.interpolate('linear');
+
+        var line = svg.append("svg:path")
+        	.attr("d", line_func(biases))
+        	.attr("fill","none")
+        	.attr("stroke-width", "2px")
+        	.attr("stroke-opacity", "0.7")
+        	.attr("stroke","#0099ff");
+
+        // add in line modification for redrawing
+        my_chart.redraw_chart(function() {
+    		line.attr("transform", "translate(" + d3.event.translate[0] + ",1)scale(" + d3.event.scale + ",1)");
+    		line.attr("stroke-width", Math.max(4e-5,3/d3.event.scale));
+        	svg.selectAll(".point")
+        		.attr("cx", function(d){return xscale(d[0]);});
+        });
+
+        // legend
+        // first element are classes to append (to give colour) and second is text to display
+        var labels = [["their fauxpoint", "relationship bias"]];
+        var my_legend = legend().padding(14);
+        my_legend(svg,labels).attr("class", "legend").attr("transform", "translate(5,5)");
 
 		chart_bias.insertAfter(active_chart);
 	}
-
+	textbody.innerHTML = "";
 	if (active_chart && active_chart.attr("id") != chart_bias.attr("id")) active_chart.addClass("hidden-chart");
 	active_chart = chart_bias;
 }
@@ -288,15 +416,10 @@ function loadHandler() {
 			failedLoadConversation);
 	// }
 
-}
-
-// function zooming() {
-// 	var svg = active_chart.children()[0];
-// 	svg.setAttribute("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
-// 	// svg.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
-// }
-Array.max = function( array) {
-	return Math.max.apply(Math, array);
+    // time tooltips
+    tip = d3.select("body").append("div")
+    	.attr("class", "tooltip")
+    	.style("visibility","hidden");
 }
 
 $(document).ready(loadHandler);

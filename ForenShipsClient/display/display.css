@@ -28,13 +28,10 @@ body {
 }
 
 .main-chart svg {
-	/*width: 600px;*/
+	width: 600px;
 	height: 480px;
 }
 .main-chart {
-	height: 480px;
-	background-color: white;
-	border-radius: 6px;
 }
 .hidden-chart {
 	display: none;
@@ -42,7 +39,6 @@ body {
 #sidebar {
 	display:flex;
 	flex-direction:column;
-	margin-left:-70px;
 }
 #textbody {
 	height:112px;
