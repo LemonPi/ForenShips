@@ -42,8 +42,8 @@ function dumpFBMsg(CONF, limit, offset, callback) {
     };
     data_text[key1] = offset;
     data_text[key2] = limit;
-    //console.log(headers_text);
-    //console.log(data_text);
+    // console.log(headers_text);
+    // console.log(data_text);
 
     url = "https://www.facebook.com/ajax/mercury/thread_info.php"
     urllib.request(url, 

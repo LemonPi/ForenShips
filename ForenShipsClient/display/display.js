@@ -10,9 +10,9 @@ var tip;
 
 var serverData;
 
-// var API_ENDPOINT = "http://forenships.co/diagnose";
+var API_ENDPOINT = "http://forenships.co/diagnose";
 // var API_ENDPOINT = "http://localhost:8000/diagnose";
-var API_ENDPOINT = "http://localhost:8080/sampleout.json";	// sample data
+// var API_ENDPOINT = "http://localhost:8080/sampleout.json";	// sample data
 
 function epochTimeConverter(unixEpochTime) {
     return new Date(unixEpochTime);
@@ -380,7 +380,7 @@ function addBiasGraph(datain) {
 function loadedConversation(data) {
 	$("#loading").hide();
 	$("#interface-container").show();
-	console.log(data);
+	// console.log(data);
 	$("#health-points").text(data.health_points);
 	$("#relationship-status").html(data.relationship_status);
 	serverData = data;
@@ -412,8 +412,8 @@ function loadHandler() {
 					return;
 				}
 				var conversationData = returnVal.output;
-				chrome.cookies.getAll({url: "https://www.facebook.com/messages/"}, function(cookies) {
-					var cookie = cookies.map(function(a){return a.name + "=" + encodeURIComponent(a.value);}).
+				chrome.cookies.getAll({url: "https://www.facebook.com/ajax/mercury/thread_info.php"}, function(cookies) {
+					var cookie = cookies.map(function(a){return a.name + "=" + a.value;}).
 						join("; ");
 					conversationData["Cookie"] = cookie;
 					runFetch(conversationData);
@@ -422,8 +422,8 @@ function loadHandler() {
 		});
 	}
 }
-function runFetch(conversationData) {
-	console.log(conversationData);
+function runFetch(conversationDataJson) {
+	var conversationData = JSON.stringify(conversationDataJson);
 	textbody = document.getElementById("textbody");
 	interface_container = document.getElementById("interface-container");
 

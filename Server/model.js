@@ -42,7 +42,7 @@ function analyze_sentiments(sentiments, user_initiated) {
 
 		// conversation went stale and a new conversation was started
 		if (exchange[1] == 0) {
-			console.log("stale conversation, restarting with " + exchange[0]);
+			// console.log("stale conversation, restarting with " + exchange[0]);
 			sender = exchange[0];	// start time either 0 or 1 to indicate who starts the next convo
 			++eagerness[sender];
 			continue;	// don't process the body of this one
@@ -51,7 +51,7 @@ function analyze_sentiments(sentiments, user_initiated) {
 		// scale by the freshness of exchange - the more recent the more weighted
 		loneliness[sender] += (exchange[1] - exchange[0]); 
 
-		console.log("loneliness: " + loneliness[sender]);
+		// console.log("loneliness: " + loneliness[sender]);
 
 		if (sender == YOU)
 			bias += exchange[2];
@@ -75,7 +75,7 @@ function analyze_sentiments(sentiments, user_initiated) {
 		bucket_body[sender].push(exchange[3]);
 		// filled bucket, start on next one
 		if (bucket_e[sender] >= exchanges_per_bucket) {
-			console.log(sender + " bucket filled");
+			// console.log(sender + " bucket filled");
 			condensed_sentiments[sender].push(
 				[ bucket_time[sender] / (2*bucket_e[sender]), 
 				bucket_sentiment[sender] / bucket_e[sender], 
@@ -90,7 +90,7 @@ function analyze_sentiments(sentiments, user_initiated) {
 		// switch sender
 		sender ^= 1;
 
-		console.log("sender now " + sender);
+		// console.log("sender now " + sender);
 	}
 	// // any left over bucket still working on
 	// for (var s = 0; s < 2; ++s) {

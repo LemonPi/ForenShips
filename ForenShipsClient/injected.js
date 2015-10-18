@@ -25,7 +25,7 @@ function getInfo() {
 	if (msgGroups.length != 1) {
 		return {error: "Group messages not supported"};
 	}
-	asyncParams.uid = [asyncParams.__user, msgGroups[0]];
+	asyncParams.uids = [asyncParams.__user, msgGroups[0]];
 	return {output: asyncParams};
 }
 document.getElementById("forenships-script").textContent = JSON.stringify(getInfo());
