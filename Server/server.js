@@ -9,7 +9,7 @@ var SAMPLE_POINTS = 30;
 
 function handle_request(req, res) {
 	try {
-		console.log(req.url);
+		//console.log(req.url);
 		// dispatch
 		dispatcher.dispatch(req, res);
 	}
@@ -62,7 +62,7 @@ dispatcher.onGet("/diagnose", function(req, res) {
 	res.writeHead(200, {"Content-Type": "application/json"});
 
 	var dataquery = querystring.parse(req.url.substring(req.url.indexOf("?") + 1));
-	console.log(dataquery);
+	//console.log(dataquery);
 	var user_data = JSON.parse(dataquery.data);
 
 	// two lists of (time start, time end, sentiment) tuples where time is sec since epoch and sentiment is float

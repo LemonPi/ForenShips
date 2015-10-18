@@ -12,11 +12,11 @@ function analyze_sentiments(sentiments, user_initiated) {
 
 	var condensed_sentiments = [[],[]];
 	var bias_history = [];
-	console.log("sentiment length: " + sentiments.length);
+	//console.log("sentiment length: " + sentiments.length);
 	// divide sentiments into at most 30 exchanges to be plotted, but analysis should still be done on each exchange
 	var num_exchanges = sentiments.length;
 	var exchanges_per_bucket = Math.max(1, num_exchanges / (2 * 120));
-	console.log(exchanges_per_bucket);
+	//console.log(exchanges_per_bucket);
 
 	// length of time until they responded to your first message
 	var loneliness = [0, 0];
@@ -42,7 +42,7 @@ function analyze_sentiments(sentiments, user_initiated) {
 
 		// conversation went stale and a new conversation was started
 		if (exchange[1] == 0) {
-			console.log("stale conversation, restarting with " + exchange[0]);
+			//console.log("stale conversation, restarting with " + exchange[0]);
 			sender = exchange[0];	// start time either 0 or 1 to indicate who starts the next convo
 			++eagerness[sender];
 			continue;	// don't process the body of this one
@@ -51,7 +51,7 @@ function analyze_sentiments(sentiments, user_initiated) {
 		// scale by the freshness of exchange - the more recent the more weighted
 		loneliness[sender] += (exchange[1] - exchange[0]); 
 
-		console.log("loneliness: " + loneliness[sender]);
+		//console.log("loneliness: " + loneliness[sender]);
 
 		if (sender == YOU)
 			bias += exchange[2];
@@ -75,7 +75,7 @@ function analyze_sentiments(sentiments, user_initiated) {
 		bucket_body[sender].push(exchange[3]);
 		// filled bucket, start on next one
 		if (bucket_e[sender] >= exchanges_per_bucket) {
-			console.log(sender + " bucket filled");
+			//console.log(sender + " bucket filled");
 			condensed_sentiments[sender].push(
 				[ bucket_time[sender] / (2*bucket_e[sender]), 
 				bucket_sentiment[sender] / bucket_e[sender], 
@@ -90,12 +90,12 @@ function analyze_sentiments(sentiments, user_initiated) {
 		// switch sender
 		sender ^= 1;
 
-		console.log("sender now " + sender);
+		//console.log("sender now " + sender);
 	}
 	// // any left over bucket still working on
 	// for (var s = 0; s < 2; ++s) {
 	// 	if (bucket_e[s]) {
-	// 		console.log("left over bucket");	
+	// 		//console.log("left over bucket");	
 	// 		condensed_sentiments[s].push([bucket_time[s] / (2*bucket_e[s]), 
 	// 			bucket_sentiment[s] / bucket_e[s]]);
 	// 	}
@@ -166,8 +166,8 @@ function analyze_sentiments(sentiments, user_initiated) {
 	var their_responsiveness = average_over_array(responsiveness[THEM]);
 	var relative_responsiveness = your_responsiveness / their_responsiveness;
 
-	console.log("Responsiveness");
-	console.log(relative_responsiveness);
+	//console.log("Responsiveness");
+	//console.log(relative_responsiveness);
 	ratioflag(relative_responsiveness, ratio_threshold, UNEQUAL_RESPONSIVENESS);
 	valueflag([your_responsiveness, their_responsiveness], frequency_threshold, INFREQUENT_MESSAGES, warning_penalty);
 
@@ -179,9 +179,9 @@ function analyze_sentiments(sentiments, user_initiated) {
 
 
 	// ratio where 1 is you guys iniate the same number of conversations
-	console.log("Eagerness");
-	console.log(eagerness[YOU]);
-	console.log(eagerness[THEM]);
+	//console.log("Eagerness");
+	//console.log(eagerness[YOU]);
+	//console.log(eagerness[THEM]);
 	var relative_eagerness = eagerness[YOU] / eagerness[THEM];
 	ratioflag(relative_eagerness, ratio_threshold, UNEQUAL_EAGERNESS);
 
@@ -193,8 +193,8 @@ function analyze_sentiments(sentiments, user_initiated) {
 
 	// average discrepency between 0-1, 0 means you both express similar sentiments
 	var avg_discrepency = discrepency / num_exchanges;	
-	console.log("Discrepency");
-	console.log(avg_discrepency);
+	//console.log("Discrepency");
+	//console.log(avg_discrepency);
 
 	if (avg_discrepency > discrepency_threshold)
 		warnings |= LARGE_DISCREPENCY;
@@ -203,9 +203,9 @@ function analyze_sentiments(sentiments, user_initiated) {
 	health_points += ppm * (1 - avg_discrepency);
 
 
-	console.log("Loneliness");
-	console.log(loneliness[YOU]);
-	console.log(loneliness[THEM]);
+	//console.log("Loneliness");
+	//console.log(loneliness[YOU]);
+	//console.log(loneliness[THEM]);
 	var relative_loneliness = loneliness[YOU] / loneliness[THEM];
 
 	ratioflag(relative_loneliness, ratio_threshold, FOREVER_ALONE);

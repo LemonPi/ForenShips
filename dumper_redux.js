@@ -1,9 +1,7 @@
-var urllib = require('urllib');
-var Benchmark = require('benchmark');
+var Xray = require('x-ray');
+var x = Xray();
 
 //var settings = require('./settings_local');
-
-// TODO Currently limited to 2000 messages
 
 function dumpFBMsg(CONF, limit, offset, callback) {
     var error_timeout = 30; // Change this to alter error timeout (seconds)
@@ -48,15 +46,8 @@ function dumpFBMsg(CONF, limit, offset, callback) {
 
     url = "https://www.facebook.com/ajax/mercury/thread_info.php"
     var qtime = process.hrtime();
-    console.log("boo");
-    var mybench = new Benchmark('mybench', 
-    urllib.request(url, 
-        {
-            method: 'GET',
-            headers: headers_text,
-            data: data_text
-        }, 
-        function(err, outdata, res) {
+    x(url, data_text)(function(err, outdata, res) {
+            console.log(outdata);
             var diff = process.hrtime(qtime);
             console.log("Request: %d", (diff[0]*1e9 + diff[1])/1e9);
 
@@ -82,11 +73,8 @@ function dumpFBMsg(CONF, limit, offset, callback) {
                 callback(err, []);
             }
     })
-    );
     var diff = process.hrtime(qtime);
     console.log("Request2: %d", (diff[0]*1e9 + diff[1])/1e9);
-
-    Benchmark.filter('mybench', 'successful');
     
     if (raw_messages) {
         return raw_messages;

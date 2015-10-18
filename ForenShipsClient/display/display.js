@@ -8,8 +8,8 @@ var serverData;
 
 var conversationData = "{}";
 // var API_ENDPOINT = "http://forenships.co/diagnose";
-// var API_ENDPOINT = "http://localhost:8000/diagnose";
-var API_ENDPOINT = "http://localhost:8080/sampleout.json";	// sample data
+var API_ENDPOINT = "http://localhost:8000/diagnose";
+// var API_ENDPOINT = "http://localhost:8080/sampleout.json";	// sample data
 
 function epochTimeConverter(unixEpochTime) {
     return new Date(unixEpochTime);
@@ -190,13 +190,18 @@ function addBiasGraph(datain) {
 
 function loadedConversation(data) {
 	$("#loading").hide();
-	$("#interface-container").show();
-	console.log(data);
-	$("#health-points").text(data.health_points);
-	$("#relationship-status").html(data.relationship_status);
-	serverData = data;
 
-	addGraph(data);
+    // XXX COMMENT AFTER TEST
+    $("#done").text("DONE").show();
+
+    // XXX UNCOMMENT AFTER TEST
+    //$("#interface-container").show();
+    //console.log(data);
+    //$("#health-points").text(data.health_points);
+    //$("#relationship-status").html(data.relationship_status);
+    //serverData = data;
+
+	//addGraph(data);
 }
 function failedLoadConversation(xhr, textStatus, error) {
 	$("#loading").hide();
@@ -209,6 +214,7 @@ function loadHandler() {
 		$("#error-display").text("Hey, this isn't a Facebook conversation (go to messages full view)!").show();
 		return;
 	}
+    
 	textbody = document.getElementById("textbody");
 	interface_container = document.getElementById("interface-container");
 

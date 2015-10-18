@@ -1,7 +1,7 @@
 "use strict";
 // fix by making dict of dicts keyed on URL/tab to allow multi-tab/multi-window usage
 var active = {};
-var monUrl = "https://www.facebook.com/ajax/mercury/thread_info.php";
+var monUrl = "https://www.facebook.com/ajax/mercury/thread_info.php*";
 var needsFromPostData = ["__user", "__a", "__dyn", "__req", "fb_dtsg", "ttstamp", "__rev"];
 chrome.webRequest.onBeforeRequest.addListener(
         handleBeforeRequest, {urls: [monUrl]},
