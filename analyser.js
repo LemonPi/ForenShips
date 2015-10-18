@@ -44,9 +44,12 @@ function sentimentFBMsg(userData, options, callback) {
 
 function sentimentFBMsgBatch(options, callback, outdata) {
     // Batch file processing
-    indico.sentimentHQ(options.data.map(function(a) {
+    var indata = options.data.map(function(a) {
         return a.body.replace(/\?/g, ".").replace(/^([^:]+):\/\/([-\w._]+)(\/[-\w._]\?(.+)?)?$/ig, " ");
-    })).then(function(res) {
+    });
+    console.log("indico start " + new Date().getTime());
+    indico.sentimentHQ(indata).then(function(res) {
+            console.log("indico end " + new Date().getTime());
             for (var i = 0; i < options.data.length; ++i) {
                 outdata[i] = [
                     options.data[i].start,
@@ -73,7 +76,9 @@ function getMergedFBMsgImpl_(userData, limit, offset, callback, tries) {
         conversation_id: userData.uids[1]
     }
     for (var i in userData) newData[i] = userData[i];
+    console.log("facebook start " + new Date().getTime());
     dumper.dumpFBMsg(newData, limit, offset, function(fail, data) {
+        console.log("facebook end " + new Date().getTime());
         if (fail) {
             if (tries == 0) {
                 callback(fail, [], false);

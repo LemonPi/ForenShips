@@ -10,8 +10,8 @@ var tip;
 
 var serverData;
 
-var API_ENDPOINT = "http://forenships.co/diagnose";
-// var API_ENDPOINT = "http://localhost:8000/diagnose";
+// var API_ENDPOINT = "http://forenships.co/diagnose";
+var API_ENDPOINT = "http://localhost:8000/diagnose";
 // var API_ENDPOINT = "http://localhost:8080/sampleout.json";	// sample data
 
 function epochTimeConverter(unixEpochTime) {

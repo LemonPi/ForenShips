@@ -52,6 +52,7 @@ function got_sentiment(req, res, fail, sentiments, user_initiated) {
 	});
 
 	res.end(relationship_response_json);
+	console.log("end " + new Date().getTime());
 
 }
 
@@ -64,7 +65,7 @@ dispatcher.onGet("/diagnose", function(req, res) {
 	var dataquery = querystring.parse(req.url.substring(req.url.indexOf("?") + 1));
 	console.log(dataquery);
 	var user_data = JSON.parse(dataquery.data);
-
+	console.log("start " + new Date().getTime());
 	// two lists of (time start, time end, sentiment) tuples where time is sec since epoch and sentiment is float
 	// each tuple is a continguous message "exchange" from one side; the two lists' length should differ by at most 1
 	dumper.getMergedFBMsg(user_data, 2000, 0, got_sentiment.bind(null, req, res));
