@@ -73,6 +73,39 @@ function getMergedFBMsgImpl_(userData, limit, offset, callback, tries) {
         conversation_id: userData.uids[1]
     }
     for (var i in userData) newData[i] = userData[i];
+	var msgPerSplit = 200;
+	var splitnum = Math.ceil((limit - offset) / msgPerSplit);
+	var splits = new Array(splitnum);
+	var failCount = 0;
+	var returnedCount = 0;
+	var sumSize = 0;
+	for (var i = 0; i < splitnum; i++) {
+		var newoffset = offset + i*msgPerSplit;
+		var newlimit = msgPerSplit;
+		dumper.dumpFBMsg(newData, newlimit, newoffset, (function(i, fail, data) {
+			returnedCount++;
+			if (fail) {
+				failCount++;
+			} else {
+				splits[i] = data;
+				sumSize += data.length;
+			}
+			if (returnedCount == splits.length) {
+				// all splits came back
+				if (failCount > 0) {
+					if (tries == 0) {
+						callback(fail, [], false);
+					} else {
+						console.log(fail);
+						getMergedFBMsgImpl_(userData, limit, offset, callback, tries - 1);
+					}
+					return;
+				}
+				var merged = mergeFBMsg(userData, Array.prototype.concat.apply([], splits));
+				sentimentFBMsg(userData, merged, callback);
+			}
+		}).bind(null, i));
+	}
     dumper.dumpFBMsg(newData, limit, offset, function(fail, data) {
         if (fail) {
             if (tries == 0) {
