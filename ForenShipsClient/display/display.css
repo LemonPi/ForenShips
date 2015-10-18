@@ -104,3 +104,34 @@ body {
 .legend-text {
 	font-variant:small-caps;
 }
+
+.loading-div {
+	width: 128px;
+	height: 128px;
+	background-image: url("../images/icon128.png");
+	position: relative;
+}
+.loading-div-inner {
+	width: 100%;
+	background-image: url("../images/icon128.png");
+	-webkit-filter: grayscale(100%);
+	filter: grayscale(100%);
+	animation-duration: 8s;
+	animation-name: loading-wipeup;
+}
+@keyframes loading-wipeup {
+	from {
+		height: 90%;
+	}
+	to {
+		height: 10%;
+	}
+}
+#loading {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	text-align: center;
+	margin-left: -64px;
+	margin-top: -94px;
+}
