@@ -17,6 +17,60 @@ function epochTimeConverter(unixEpochTime) {
 function toXYObj(o) {
 	return {x: o[0], y: o[1], size: o[2].length, body: o[2]};
 }
+function legend() {
+	var w = 18;
+    var h = 18;
+    var cppx = 6;
+    var padding = 8;
+
+    // generate chart there
+    function lg(svg, labels) {
+	    var legend = svg.append("g");
+	    var prev_width = 0;
+	    for (var i = 0; i < labels.length; ++i) {
+	    	var cell = legend.append("g")
+	    		.attr("attr","cell")
+	    		.attr("transform", "translate("+prev_width+",0)");
+
+	    	prev_width += w + cppx*labels[i][1].length + padding + 4;
+
+	    	cell.append("circle")
+	    		.attr("class", labels[i][0])
+	    		.attr("cx",w/2+2)
+	    		.attr("cy",h/2+2)
+	    		.attr("r", h/2);
+	    		// .attr("width", w)
+
+	    	cell.append("text")
+	    		.attr("class", "legend-text")
+	    		.attr("transform", "translate("+ (padding/2 + w + cppx*labels[i][1].length/2) +",15)")
+	    		.attr("text-anchor", "middle")
+	    		.text(labels[i][1]);
+
+	    }	
+    	return legend;
+    }
+
+    lg.w = function(value) {
+    	if (!arguments.length) return w;
+    	w = value;
+    	return lg;
+    }
+    lg.h = function(value) {
+    	if (!arguments.length) return h;
+    	h = value;
+    	return lg;
+    }
+    lg.padding = function(value) {
+    	if (!arguments.length) return padding;
+    	padding = value;
+    	return lg;
+    }
+
+    return lg;
+
+}
+
 function addGraph(datain) {
 	var chart_sentiments = $($(interface_container).find('#chart')[0]);
 	chart_sentiments.removeClass("hidden-chart");
@@ -69,7 +123,7 @@ function addGraph(datain) {
 
 
         function redraw_chart() {
-        	svg.selectAll("circle")
+        	svg.selectAll(".point")
         		.attr("cx", function(d){return xscale(d[0]);});
         }
 
@@ -83,7 +137,7 @@ function addGraph(datain) {
         	.data(mine)
         	.enter()
         	.append("circle")
-        	.attr("class", "mp")	// my points
+        	.attr("class", "mine point")	// my points
         	.attr("cx", function(d) {return xscale(d[0]);})
         	.attr("cy", function(d) {return yscale(d[1]);})
         	.attr("r", function(d) {return d[2].length * 0.04;})
@@ -103,7 +157,7 @@ function addGraph(datain) {
         	.data(them)
         	.enter()
         	.append("circle")
-        	.attr("class", "tp")	// their points
+        	.attr("class", "their point")	// their points
         	.attr("cx", function(d) {return xscale(d[0]);})
         	.attr("cy", function(d) {return yscale(d[1]);})
         	.attr("r", function(d) {return d[2].length * 0.04;})
@@ -127,7 +181,7 @@ function addGraph(datain) {
         var actual_yaxis = svg.append("g")
         	.attr("class", "axis")
         	.attr("transform", "translate(" + padding + ",0)")
-        	.call(yaxis)
+        	.call(yaxis);
 
         // zoom on x axis
         var xzoom = d3.behavior.zoom()
@@ -139,9 +193,17 @@ function addGraph(datain) {
         	});
         xzoom(svg);
 
+        // legend
+        // first element are classes to append (to give colour) and second is text to display
+        var labels = [["mine fauxpoint","sent"],["their fauxpoint","received"]];
+        var my_legend = legend().padding(14);
+        my_legend(svg,labels).attr("class", "legend").attr("transform", "translate(5,5)");
+
 		chart_sentiments.attr("data-created", "true");
 	}
-	if (active_chart && active_chart.attr("id") != chart_sentiments.attr("id")) active_chart.addClass("hidden-chart");
+	// hide the active chart if it's not this chart
+	if (active_chart && active_chart.attr("id") != chart_sentiments.attr("id")) 
+		active_chart.addClass("hidden-chart");
 	active_chart = chart_sentiments;
 }
 

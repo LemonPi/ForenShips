@@ -1,8 +1,8 @@
 {
 	"manifest_version": 2,
 	"name": "ForenShips",
-	"version": "1.0.1",
-	"description": "Client for ForenShips",
+	"version": "1.0.2",
+	"description": "Client for ForenShips, a debugging tool for friendships and relationships",
 	"browser_action": {
 		"default_title": "ForenShips",
 		"default_popup": "display/display.html"

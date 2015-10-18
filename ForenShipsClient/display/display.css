@@ -1,9 +1,12 @@
 body {
 	font-family: Arial, sans-serif;
 	width: 800px;
-	height: 576px;
+	height: 584px;
 	overflow-x:hidden;
+	overflow-y:hidden;
 }
+::-webkit-scrollbar {width:10px;}
+::-webkit-scrollbar-thumb {background : #333f50;}
 
 #health-points {
 	font-size: 2em;
@@ -41,26 +44,28 @@ body {
 	margin-left:-70px;
 }
 #textbody {
+	height:112px;
 	color:#0099ff;	
+	overflow-y:auto;
 }
 .mymessage {
 	color:#ff9900 !important;
 }
 
 
-.mp {
+.mine {
 	fill:#ff9900;
 	stroke:#ff9900;
-	fill-opacity:0.7;
-	stroke-width:2;
 }
-.tp {
+.their {
 	fill:#0099ff;
-	stroke:#0099ff;
+	stroke:#0099ff;	
+}
+.point, .fauxpoint {
 	fill-opacity:0.7;
 	stroke-width:2;
 }
-.tp:hover, .mp:hover {
+.point:hover, .fauxpoint:hover {
 	fill-opacity:1;
 	stroke-width:9;
 }
@@ -97,4 +102,8 @@ body {
 	cursor:pointer;
 	font-size:14px;
 	color:rgb(66, 180, 230);
+}
+
+.legend-text {
+	font-variant:small-caps;
 }
