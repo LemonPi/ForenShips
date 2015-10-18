@@ -6,7 +6,6 @@ var active_chart;
 
 var serverData;
 
-var conversationData = "{}";
 // var API_ENDPOINT = "http://forenships.co/diagnose";
 // var API_ENDPOINT = "http://localhost:8000/diagnose";
 var API_ENDPOINT = "http://localhost:8080/sampleout.json";	// sample data
@@ -264,13 +263,39 @@ function failedLoadConversation(xhr, textStatus, error) {
 	$("#loading").hide();
 	$("#error-display").text(textStatus + ": " + error).show();
 }
+var useLegacyFetch = false;
 function loadHandler() {
-	conversationData = localStorage.conversationData;
-	if (!conversationData) {
-		$("#loading").hide();
-		$("#error-display").text("Hey, this isn't a Facebook conversation (go to messages full view)!").show();
-		return;
+	if (useLegacyFetch) {
+		var conversationData = localStorage.conversationData;
+		if (!conversationData) {
+			$("#loading").hide();
+			$("#error-display").text("Hey, this isn't a Facebook conversation (go to messages full view)!").show();
+			return;
+		}
+		runFetch(conversationData);
+	} else {
+		chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+			var tab = tabs[0];
+			chrome.tabs.executeScript(tab.id, {file: "content.js"}, function(returnVals) {
+				var returnVal = JSON.parse(returnVals[0]);
+				if (returnVal.error) {
+					$("#loading").hide();
+					$("#error-display").text(returnVal.error).show();
+					return;
+				}
+				var conversationData = returnVal.output;
+				chrome.cookies.getAll({url: "https://www.facebook.com/messages/"}, function(cookies) {
+					var cookie = cookies.map(function(a){return a.name + "=" + encodeURIComponent(a.value);}).
+						join("; ");
+					conversationData["Cookie"] = cookie;
+					runFetch(conversationData);
+				});
+			});
+		});
 	}
+}
+function runFetch(conversationData) {
+	console.log(conversationData);
 	textbody = document.getElementById("textbody");
 	interface_container = document.getElementById("interface-container");
 
